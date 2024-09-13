@@ -93,7 +93,7 @@
         <button type="submit">アカウント作成</button>
     </form>
     <div class="link">
-        アカウントをすでに持っていますか？ <a href="login.html">Login here</a>.
+        アカウントをすでに持っていますか？ <a href="roguin.html">ログインページへ</a>.
     </div>
 </div>
 
@@ -132,20 +132,20 @@
             .then((userCredential) => {
                 // サインアップ成功
                 const user = userCredential.user;
-                alert('Sign Up successful!');
+                alert('アカウントが作成されました！');
                 console.log('User:', user);
                 // 必要に応じてユーザー情報を更新することもできます
                 return user.updateProfile({ displayName: username });
             })
             .then(() => {
                 // サインアップ後にログインページにリダイレクト
-                window.location.href = 'login.html';
+                window.location.href = 'roguin.html';
             })
             .catch((error) => {
                 // エラー処理
                 const errorCode = error.code;
                 const errorMessage = error.message;
-                alert('Error: ' + errorMessage);
+                alert('エラー: ' + errorMessage);
             });
     });
 </script>
