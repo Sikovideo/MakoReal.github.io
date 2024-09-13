@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - MakoReal</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000;
+            color: #fff;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            width: 300px;
+            padding: 20px;
+            background-color: #111;
+            border-radius: 10px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        label {
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            background-color: #222;
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #00ff00;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #00cc00;
+        }
+
+        .signup-link {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .signup-link a {
+            color: #00ff00;
+            text-decoration: none;
+        }
+
+        .signup-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+    <!-- Firebase App (必須) -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+    <!-- Firebase Authentication (必須) -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"></script>
+    <!-- Firebase Analytics (必要な場合) -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-analytics.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <h1>MakoReal</h1>
+    <form id="login-form">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required>
+        
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required>
+        
+        <button type="submit">Login</button>
+    </form>
+    <div class="signup-link">
+        Don't have an account? <a href="signup.html">Sign up here</a>.
+    </div>
+</div>
+
+<script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-analytics.js";
+
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyBNwcRVa1Ip_3ZX3qjxkbwd-ViScS3lbEg",
+        authDomain: "makoreal.firebaseapp.com",
+        projectId: "makoreal",
+        storageBucket: "makoreal.appspot.com",
+        messagingSenderId: "1063358529065",
+        appId: "1:1063358529065:web:e7f2da6177516a71926638",
+        measurementId: "G-K35J2B3QJT"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const analytics = getAnalytics(app);
+
+    document.getElementById('login-form').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        // フォームの入力値を取得
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+
+        // Firebase Authenticationを使ってログイン
+        signInWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+                // ログイン成功
+                const user = userCredential.user;
+                alert('Login successful!');
+                console.log('User:', user);
+                // 必要に応じてユーザー情報にアクセスすることもできます
+                window.location.href = 'homepage.html'; // ログイン後のリダイレクト先を設定
+            })
+            .catch((error) => {
+                // エラー処理
+                const errorCode = error.code;
+                const errorMessage = error.message;
+                alert('Error: ' + errorMessage);
+            });
+    });
+</script>
+
+</body>
+</html>
