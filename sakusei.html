@@ -3,19 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>アカウント作成 - MakoReal</title>
+    <title>Sign Up - MakoReal</title>
     <style>
-        /* スタイルは省略 */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000;
+            color: #fff;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            width: 300px;
+            padding: 20px;
+            background-color: #111;
+            border-radius: 10px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        label {
+            font-size: 14px;
+        }
+
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            background-color: #222;
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+        }
+
+        input[type="file"] {
+            padding: 5px;
+            background-color: #333;
+        }
+
+        button {
+            background-color: #fff;
+            color: #000;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #eee;
+        }
+
+        .link {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .link a {
+            color: #00ff00;
+            text-decoration: none;
+        }
+
+        .link a:hover {
+            text-decoration: underline;
+        }
     </style>
-    <!-- Firebase SDK -->
+    <!-- Firebase App (必須) -->
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+    <!-- Firebase Authentication (必須) -->
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"></script>
+    <!-- Firebase Storage (アイコンのアップロードに必要) -->
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-storage.js"></script>
 </head>
 <body>
 
 <div class="container">
-    <header>MakoReal.</header>
+    <header>MakoReal - アカウント作成</header>
     <form id="signup-form">
         <label for="username">名前</label>
         <input type="text" id="username" name="username" required>
@@ -26,17 +95,18 @@
         <label for="password">パスワード</label>
         <input type="password" id="password" name="password" required>
         
-        <label for="icon">アイコン</label>
-        <input type="file" id="icon" accept="image/*" required>
+        <label for="icon">アイコン画像</label>
+        <input type="file" id="icon" name="icon" accept="image/*" required>
         
         <button type="submit">アカウント作成</button>
     </form>
     <div class="link">
-        アカウントをすでに持っていますか？ <a href="roguin.html">ログイン</a>.
+        すでにアカウントをお持ちですか？ <a href="roguin.html">ログイン</a>
     </div>
 </div>
 
 <script type="module">
+    // Firebase設定
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
     import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-storage.js";
@@ -51,10 +121,12 @@
         measurementId: "G-K35J2B3QJT"
     };
 
+    // Firebase初期化
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const storage = getStorage(app);
 
+    // サインアップフォーム送信時の処理
     document.getElementById('signup-form').addEventListener('submit', function(event) {
         event.preventDefault();
 
@@ -63,28 +135,30 @@
         const password = document.getElementById('password').value;
         const iconFile = document.getElementById('icon').files[0];
 
+        // アカウント作成
         createUserWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
                 const user = userCredential.user;
-
-                // アイコンのアップロード
-                const storageRef = ref(storage, `users/${user.uid}/icon.jpg`);
-                return uploadBytes(storageRef, iconFile)
-                    .then(() => getDownloadURL(storageRef))
-                    .then((iconUrl) => {
-                        // プロフィールを更新
-                        return updateProfile(user, {
-                            displayName: username,
-                            photoURL: iconUrl
-                        });
+                
+                // アイコンをFirebase Storageにアップロード
+                const storageRef = ref(storage, 'icons/' + user.uid + '/profile.jpg');
+                return uploadBytes(storageRef, iconFile).then(() => {
+                    return getDownloadURL(storageRef);
+                }).then((downloadURL) => {
+                    // ユーザープロフィールに名前とアイコンURLを更新
+                    return updateProfile(user, {
+                        displayName: username,
+                        photoURL: downloadURL
                     });
-            })
-            .then(() => {
-                // ログイン後にMakoReal.htmlにリダイレクト
-                window.location.href = 'MakoReal.html';
+                }).then(() => {
+                    // 成功時にMakoReal.htmlにリダイレクト
+                    alert('アカウントが作成されました！');
+                    window.location.href = 'MakoReal.html';
+                });
             })
             .catch((error) => {
-                alert('エラー: ' + error.message);
+                const errorMessage = error.message;
+                alert('エラー: ' + errorMessage);
             });
     });
 </script>
