@@ -84,16 +84,16 @@
 <div class="container">
     <h1>MakoReal</h1>
     <form id="login-form">
-        <label for="email">Email</label>
+        <label for="email">メールアドレス</label>
         <input type="email" id="email" name="email" required>
         
-        <label for="password">Password</label>
+        <label for="password">パスワード</label>
         <input type="password" id="password" name="password" required>
         
-        <button type="submit">Login</button>
+        <button type="submit">ログイン</button>
     </form>
     <div class="signup-link">
-        Don't have an account? <a href="signup.html">Sign up here</a>.
+        アカウントを持っていませんか？ <a href="signup.html">アカウント作成</a>.
     </div>
 </div>
 
@@ -131,7 +131,7 @@
             .then((userCredential) => {
                 // ログイン成功
                 const user = userCredential.user;
-                alert('Login successful!');
+                alert('ログイン成功');
                 console.log('User:', user);
                 // 必要に応じてユーザー情報にアクセスすることもできます
                 window.location.href = 'homepage.html'; // ログイン後のリダイレクト先を設定
@@ -140,7 +140,7 @@
                 // エラー処理
                 const errorCode = error.code;
                 const errorMessage = error.message;
-                alert('Error: ' + errorMessage);
+                alert('エラー: ' + errorMessage);
             });
     });
 </script>
