@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up - MakoReal.</title>
+    <title>Sign Up - MakoReal</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -73,13 +73,15 @@
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
     <!-- Firebase Authentication (必須) -->
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"></script>
+    <!-- Firebase Storage (必須) -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-storage.js"></script>
     <!-- Firebase Analytics (必要な場合) -->
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-analytics.js"></script>
 </head>
 <body>
 
 <div class="container">
-    <header>MakoReal.</header>
+    <header>MakoReal</header>
     <form id="signup-form">
         <label for="username">名前</label>
         <input type="text" id="username" name="username" required>
@@ -89,6 +91,9 @@
         
         <label for="password">パスワード</label>
         <input type="password" id="password" name="password" required>
+        
+        <label for="avatar">プロフィール画像</label>
+        <input type="file" id="avatar" name="avatar" accept="image/*">
         
         <button type="submit">アカウント作成</button>
     </form>
@@ -101,6 +106,7 @@
     // Import the functions you need from the SDKs you need
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-storage.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-analytics.js";
 
     // Your web app's Firebase configuration
@@ -117,6 +123,7 @@
     // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    const storage = getStorage(app);
     const analytics = getAnalytics(app);
 
     document.getElementById('signup-form').addEventListener('submit', function(event) {
@@ -126,6 +133,7 @@
         const username = document.getElementById('username').value;
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
+        const avatarFile = document.getElementById('avatar').files[0];
 
         // Firebase Authenticationを使ってユーザーアカウントを作成
         createUserWithEmailAndPassword(auth, email, password)
@@ -133,13 +141,34 @@
                 // サインアップ成功
                 const user = userCredential.user;
                 alert('アカウントが作成されました！');
-                console.log('User:', user);
-                // 必要に応じてユーザー情報を更新することもできます
-                return user.updateProfile({ displayName: username });
-            })
-            .then(() => {
-                // サインアップ後にログインページにリダイレクト
-                window.location.href = 'roguin.html';
+
+                // プロフィール画像が選択されている場合、Firebase Storageにアップロード
+                if (avatarFile) {
+                    const avatarRef = ref(storage, 'avatars/' + user.uid + '/' + avatarFile.name);
+                    uploadBytes(avatarRef, avatarFile)
+                        .then((snapshot) => {
+                            // アップロード成功
+                            return getDownloadURL(avatarRef);
+                        })
+                        .then((downloadURL) => {
+                            // ユーザーのプロフィール画像URLを更新
+                            return user.updateProfile({
+                                displayName: username,
+                                photoURL: downloadURL
+                            });
+                        })
+                        .then(() => {
+                            // サインアップ後にログインページにリダイレクト
+                            window.location.href = 'roguin.html';
+                        })
+                        .catch((error) => {
+                            // エラー処理
+                            alert('エラー: ' + error.message);
+                        });
+                } else {
+                    // プロフィール画像がない場合、ユーザーのプロフィール情報を更新
+                    return user.updateProfile({ displayName: username });
+                }
             })
             .catch((error) => {
                 // エラー処理
