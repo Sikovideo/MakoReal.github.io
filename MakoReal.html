@@ -28,8 +28,9 @@
         .icon {
             width: 40px;
             height: 40px;
-            background-color: #00ff00;
+            background-color: #00ff00; /* アイコンのプレースホルダー色 */
             border-radius: 50%;
+            cursor: pointer;
         }
 
         .post-container {
@@ -77,6 +78,7 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
+            border-radius: 50%; /* 画像を丸くする */
         }
 
         .camera-preview {
@@ -84,8 +86,9 @@
             top: 10px;
             left: 10px;
             width: 100px;
-            height: 150px;
+            height: 100px;
             border: 2px solid #000;
+            border-radius: 50%; /* プレビュー画像を丸くする */
         }
 
         footer {
@@ -103,35 +106,33 @@
             border-radius: 50%;
             padding: 15px;
             font-size: 24px;
+            width: 70px;
+            height: 70px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             cursor: pointer;
+        }
+
+        .no-posts-message {
+            text-align: center;
+            color: #fff;
+            margin-top: 20px;
+            font-size: 16px;
         }
     </style>
 </head>
 <body>
 
 <header>
-    <div class="icon"></div>
+    <div class="icon" id="user-icon"></div> <!-- 左上のアイコン -->
     <h1>MakoReal.</h1>
-    <div class="icon"></div>
+    <div class="icon" id="profile-icon"></div> <!-- 右上のアイコン -->
 </header>
 
-<div class="post-container">
-    <div class="post-header">
-        <div class="username">
-            <div class="icon"></div>
-            <h2>username</h2>
-        </div>
-        <p class="time-late">??h遅れ</p>
-    </div>
-
-    <div class="post-body">
-        <!-- 大きい方の枠にもカメラで撮影された画像 -->
-        <img id="post-image" src="path/to/your/camera-image.jpg" alt="Post image">
-        <div class="camera-preview" id="camera-preview">
-            <!-- 小さい方の枠にもカメラで撮影された画像 -->
-            <img src="path/to/your/camera-image.jpg" alt="Camera image" style="width: 100%; height: 100%;">
-        </div>
-    </div>
+<div class="post-container" id="post-container">
+    <!-- 投稿がない場合のメッセージ -->
+    <div class="no-posts-message" id="no-posts-message">投稿がありません、、、友達にMakoRealを共有しよう！</div>
 </div>
 
 <footer>
@@ -143,6 +144,21 @@
     document.getElementById('transition-button').addEventListener('click', function() {
         window.location.href = 'satuei.html';
     });
+
+    // アイコンをクリックすると maipeji.html に移行
+    document.getElementById('user-icon').addEventListener('click', function() {
+        window.location.href = 'maipeji.html';
+    });
+
+    // ダミーデータによる投稿のチェック
+    const hasPosts = false; // 実際のデータに基づいて変更
+
+    if (hasPosts) {
+        document.getElementById('no-posts-message').style.display = 'none';
+        // 実際の投稿をここに追加するコードを挿入
+    } else {
+        document.getElementById('no-posts-message').style.display = 'block';
+    }
 </script>
 
 </body>
