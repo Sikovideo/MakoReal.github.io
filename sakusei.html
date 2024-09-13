@@ -73,6 +73,14 @@
         .link a:hover {
             text-decoration: underline;
         }
+
+        /* アカウント作成中のメッセージ表示用 */
+        #loading-message {
+            display: none;
+            color: #00ff00;
+            text-align: center;
+            margin-top: 20px;
+        }
     </style>
     <!-- Firebase App (必須) -->
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
@@ -103,6 +111,7 @@
     <div class="link">
         すでにアカウントをお持ちですか？ <a href="roguin.html">ログイン</a>
     </div>
+    <div id="loading-message">アカウント作成中...(しばらく時間がかかる場合があります)</div>
 </div>
 
 <script type="module">
@@ -130,6 +139,9 @@
     document.getElementById('signup-form').addEventListener('submit', async function(event) {
         event.preventDefault();
 
+        // アカウント作成中のメッセージを表示
+        document.getElementById('loading-message').style.display = 'block';
+
         const username = document.getElementById('username').value;
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
@@ -141,7 +153,7 @@
             const user = userCredential.user;
 
             // アイコンをFirebase Storageにアップロード
-            const storageRef = ref(storage, 'icons/' + user.uid + '/profile.jpg');
+            const storageRef = ref(storage, 'profileImages/' + user.uid + '/profile.jpg');
             await uploadBytes(storageRef, iconFile);
 
             // アイコンのダウンロードURLを取得
@@ -161,6 +173,9 @@
             // エラー処理
             console.error('エラーが発生しました:', error);
             alert('エラー: ' + error.message);
+        } finally {
+            // アカウント作成中のメッセージを非表示
+            document.getElementById('loading-message').style.display = 'none';
         }
     });
 </script>
