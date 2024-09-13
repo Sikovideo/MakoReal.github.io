@@ -116,6 +116,14 @@
             margin-top: 20px;
             font-size: 16px;
         }
+
+        .loading-message {
+            display: none;
+            text-align: center;
+            color: #00ff00;
+            font-size: 18px;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -131,6 +139,9 @@
 <div class="post-container" id="post-container">
     <!-- 投稿がない場合のメッセージ -->
     <div class="no-posts-message" id="no-posts-message">投稿がありません、、、友達にMakoRealを共有しよう！</div>
+
+    <!-- アカウント作成中メッセージ -->
+    <div class="loading-message" id="loading-message">アカウント作成中...</div>
 </div>
 
 <footer>
@@ -159,6 +170,25 @@
     } else {
         document.getElementById('no-posts-message').style.display = 'block';
     }
+
+    // アカウント作成のサンプル処理（実際のサインアップ処理をFirebase Authenticationで実装）
+    function createAccount() {
+        // アカウント作成中メッセージを表示
+        const loadingMessage = document.getElementById('loading-message');
+        loadingMessage.style.display = 'block';
+
+        // Firebaseなどでアカウント作成処理を実行
+        setTimeout(() => {
+            // アカウント作成完了後にリダイレクト
+            window.location.href = 'MakoReal.html';
+        }, 3000); // 3秒後にリダイレクト (ここは実際の処理に置き換えてください)
+    }
+
+    // サインアップボタンのイベントリスナー（実際のサインアップ処理をここで実装）
+    document.addEventListener('DOMContentLoaded', function () {
+        createAccount(); // アカウント作成を呼び出し
+    });
+
 </script>
 
 </body>
