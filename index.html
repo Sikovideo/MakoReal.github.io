@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - MakoReal.</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000;
+            color: #fff;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            width: 300px;
+            padding: 20px;
+            background-color: #111;
+            border-radius: 10px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        label {
+            font-size: 14px;
+        }
+
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            background-color: #222;
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+        }
+
+        button {
+            background-color: #fff;
+            color: #000;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #eee;
+        }
+
+        .link {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .link a {
+            color: #00ff00;
+            text-decoration: none;
+        }
+
+        .link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+    <!-- Firebase App (必須) -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+    <!-- Firebase Authentication (必須) -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"></script>
+    <!-- Firebase Analytics (必要な場合) -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-analytics.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <header>MakoReal.</header>
+    <form id="signup-form">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" required>
+        
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required>
+        
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required>
+        
+        <button type="submit">Create Account</button>
+    </form>
+    <div class="link">
+        Already have an account? <a href="login.html">Login here</a>.
+    </div>
+</div>
+
+<script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-analytics.js";
+
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyAO4iEczZOEmLR77hji30HXNdXdzMsW7Oc",
+        authDomain: "kanamotocasino.firebaseapp.com",
+        databaseURL: "https://kanamotocasino-default-rtdb.firebaseio.com",
+        projectId: "kanamotocasino",
+        storageBucket: "kanamotocasino.appspot.com",
+        messagingSenderId: "678578834754",
+        appId: "1:678578834754:web:390afc7aa6c0037dea8cdb",
+        measurementId: "G-PLW1WDSH6S"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const analytics = getAnalytics(app);
+
+    document.getElementById('signup-form').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        // フォームの入力値を取得
+        const username = document.getElementById('username').value;
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+
+        // Firebase Authenticationを使ってユーザーアカウントを作成
+        createUserWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+                // サインアップ成功
+                const user = userCredential.user;
+                alert('Sign Up successful!');
+                console.log('User:', user);
+                // 必要に応じてユーザー情報を更新することもできます
+                return user.updateProfile({ displayName: username });
+            })
+            .catch((error) => {
+                // エラー処理
+                const errorCode = error.code;
+                const errorMessage = error.message;
+                alert('Error: ' + errorMessage);
+            });
+    });
+</script>
+
+</body>
+</html>
