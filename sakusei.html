@@ -127,7 +127,7 @@
     const storage = getStorage(app);
 
     // サインアップフォーム送信時の処理
-    document.getElementById('signup-form').addEventListener('submit', function(event) {
+    document.getElementById('signup-form').addEventListener('submit', async function(event) {
         event.preventDefault();
 
         const username = document.getElementById('username').value;
@@ -135,31 +135,33 @@
         const password = document.getElementById('password').value;
         const iconFile = document.getElementById('icon').files[0];
 
-        // アカウント作成
-        createUserWithEmailAndPassword(auth, email, password)
-            .then((userCredential) => {
-                const user = userCredential.user;
-                
-                // アイコンをFirebase Storageにアップロード
-                const storageRef = ref(storage, 'icons/' + user.uid + '/profile.jpg');
-                return uploadBytes(storageRef, iconFile).then(() => {
-                    return getDownloadURL(storageRef);
-                }).then((downloadURL) => {
-                    // ユーザープロフィールに名前とアイコンURLを更新
-                    return updateProfile(user, {
-                        displayName: username,
-                        photoURL: downloadURL
-                    });
-                }).then(() => {
-                    // 成功時にMakoReal.htmlにリダイレクト
-                    alert('アカウントが作成されました！');
-                    window.location.href = 'MakoReal.html';
-                });
-            })
-            .catch((error) => {
-                const errorMessage = error.message;
-                alert('エラー: ' + errorMessage);
+        try {
+            // ユーザー作成
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+
+            // アイコンをFirebase Storageにアップロード
+            const storageRef = ref(storage, 'icons/' + user.uid + '/profile.jpg');
+            await uploadBytes(storageRef, iconFile);
+
+            // アイコンのダウンロードURLを取得
+            const downloadURL = await getDownloadURL(storageRef);
+
+            // プロフィール更新
+            await updateProfile(user, {
+                displayName: username,
+                photoURL: downloadURL
             });
+
+            // 成功時にMakoReal.htmlにリダイレクト
+            alert('アカウントが作成されました！');
+            window.location.href = 'MakoReal.html';
+
+        } catch (error) {
+            // エラー処理
+            console.error('エラーが発生しました:', error);
+            alert('エラー: ' + error.message);
+        }
     });
 </script>
 
