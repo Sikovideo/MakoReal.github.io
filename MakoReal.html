@@ -117,6 +117,10 @@
             font-size: 16px;
         }
     </style>
+    <!-- Firebase App (必須) -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+    <!-- Firebase Authentication (必須) -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"></script>
 </head>
 <body>
 
@@ -124,8 +128,8 @@
     <div></div> <!-- 左上の緑ボタンを削除 -->
     <h1>MakoReal.</h1>
     <div class="icon" id="profile-icon">
-        <img src="path/to/icon-image.jpg" alt="Profile Icon" style="width: 40px; height: 40px; border-radius: 50%;">
-    </div> <!-- 右上のアイコンに変更 -->
+        <img id="profile-img" src="" alt="Profile Icon" style="width: 40px; height: 40px; border-radius: 50%;"> <!-- 右上のアイコンに変更 -->
+    </div>
 </header>
 
 <div class="post-container" id="post-container">
@@ -139,7 +143,41 @@
     </button>
 </footer>
 
-<script>
+<script type="module">
+    // Firebase設定
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBNwcRVa1Ip_3ZX3qjxkbwd-ViScS3lbEg",
+        authDomain: "makoreal.firebaseapp.com",
+        projectId: "makoreal",
+        storageBucket: "makoreal.appspot.com",
+        messagingSenderId: "1063358529065",
+        appId: "1:1063358529065:web:e7f2da6177516a71926638",
+        measurementId: "G-K35J2B3QJT"
+    };
+
+    // Firebase初期化
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // ユーザーの状態を監視し、プロフィール画像を表示
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            const profileImg = document.getElementById('profile-img');
+            // photoURLがある場合、それを表示
+            if (user.photoURL) {
+                profileImg.src = user.photoURL;
+            } else {
+                profileImg.src = 'path/to/default-image.jpg'; // デフォルト画像
+            }
+        } else {
+            // ユーザーがサインインしていない場合の処理
+            window.location.href = 'roguin.html'; // ログインページへリダイレクト
+        }
+    });
+
     // 「画」ボタンを押したときに satuei.html に移行する処理
     document.getElementById('transition-button').addEventListener('click', function() {
         window.location.href = 'satuei.html';
