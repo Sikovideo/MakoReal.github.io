@@ -105,14 +105,13 @@
 
     // Your web app's Firebase configuration
     const firebaseConfig = {
-        apiKey: "AIzaSyAO4iEczZOEmLR77hji30HXNdXdzMsW7Oc",
-        authDomain: "kanamotocasino.firebaseapp.com",
-        databaseURL: "https://kanamotocasino-default-rtdb.firebaseio.com",
-        projectId: "kanamotocasino",
-        storageBucket: "kanamotocasino.appspot.com",
-        messagingSenderId: "678578834754",
-        appId: "1:678578834754:web:390afc7aa6c0037dea8cdb",
-        measurementId: "G-PLW1WDSH6S"
+        apiKey: "AIzaSyBNwcRVa1Ip_3ZX3qjxkbwd-ViScS3lbEg",
+        authDomain: "makoreal.firebaseapp.com",
+        projectId: "makoreal",
+        storageBucket: "makoreal.appspot.com",
+        messagingSenderId: "1063358529065",
+        appId: "1:1063358529065:web:e7f2da6177516a71926638",
+        measurementId: "G-K35J2B3QJT"
     };
 
     // Initialize Firebase
@@ -137,6 +136,10 @@
                 console.log('User:', user);
                 // 必要に応じてユーザー情報を更新することもできます
                 return user.updateProfile({ displayName: username });
+            })
+            .then(() => {
+                // サインアップ後にログインページにリダイレクト
+                window.location.href = 'login.html';
             })
             .catch((error) => {
                 // エラー処理
