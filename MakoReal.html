@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MakoReal</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #000;
+            color: #fff;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background-color: #000;
+        }
+
+        header h1 {
+            color: #fff;
+            font-size: 24px;
+        }
+
+        .icon {
+            width: 40px;
+            height: 40px;
+            background-color: #00ff00;
+            border-radius: 50%;
+        }
+
+        .post-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            background-color: #000;
+        }
+
+        .post-header {
+            display: flex;
+            width: 90%;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .post-header .username {
+            display: flex;
+            align-items: center;
+        }
+
+        .username .icon {
+            margin-right: 10px;
+        }
+
+        .post-header h2 {
+            font-size: 18px;
+            margin: 0;
+        }
+
+        .time-late {
+            font-size: 14px;
+            color: #999;
+        }
+
+        .post-body {
+            width: 90%;
+            background-color: #00ff00;
+            position: relative;
+            height: 500px;
+        }
+
+        .post-body img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .camera-preview {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 100px;
+            height: 150px;
+            border: 2px solid #000;
+        }
+
+        footer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background-color: #000;
+        }
+
+        .capture-button {
+            background-color: #fff;
+            color: #000;
+            border: none;
+            border-radius: 50%;
+            padding: 15px;
+            font-size: 24px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="icon"></div>
+    <h1>MakoReal.</h1>
+    <div class="icon"></div>
+</header>
+
+<div class="post-container">
+    <div class="post-header">
+        <div class="username">
+            <div class="icon"></div>
+            <h2>username</h2>
+        </div>
+        <p class="time-late">??h遅れ</p>
+    </div>
+
+    <div class="post-body">
+        <!-- 大きい方の枠にもカメラで撮影された画像 -->
+        <img id="post-image" src="path/to/your/camera-image.jpg" alt="Post image">
+        <div class="camera-preview" id="camera-preview">
+            <!-- 小さい方の枠にもカメラで撮影された画像 -->
+            <img src="path/to/your/camera-image.jpg" alt="Camera image" style="width: 100%; height: 100%;">
+        </div>
+    </div>
+</div>
+
+<footer>
+    <button class="capture-button" id="transition-button">画</button>
+</footer>
+
+<script>
+    // 「画」ボタンを押したときに satuei.html に移行する処理
+    document.getElementById('transition-button').addEventListener('click', function() {
+        window.location.href = 'satuei.html';
+    });
+</script>
+
+</body>
+</html>
