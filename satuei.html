@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MakoReal</title>
+    <style>
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            height: 100vh;
+        }
+
+        .header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background-color: #000;
+            z-index: 10;
+        }
+
+        .header .title {
+            font-size: 24px;
+            color: #fff;
+        }
+
+        .header .icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: green;
+        }
+
+        .content {
+            flex-grow: 1;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        #cameraContainer {
+            width: 75%;
+            position: relative;
+        }
+
+        #firstCapture {
+            width: 100%;
+            aspect-ratio: 3 / 4;
+            object-fit: cover;
+        }
+
+        #secondCapture {
+            width: 20%;
+            aspect-ratio: 3 / 4;
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            border: 2px solid black;
+        }
+
+        #overlayMessage {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.8); /* 真っ暗に */
+            color: white;
+            font-size: 36px;
+            padding: 20px;
+            display: none;
+            z-index: 5;
+        }
+
+        .footer {
+            width: 100%;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            background-color: #000;
+        }
+
+        .footer button {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: #fff;
+            border: none;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="icon"></div>
+    <div class="title">MakoReal.</div>
+    <div class="icon"></div>
+</div>
+
+<div class="content">
+    <div id="cameraContainer">
+        <img id="firstCapture" alt="First Capture">
+        <img id="secondCapture" alt="Second Capture">
+        <div id="overlayMessage">はい、まこと！</div>
+    </div>
+</div>
+
+<div class="footer">
+    <button id="captureButton">画</button>
+</div>
+
+<script>
+    let currentCamera = 'user'; // 初期カメラは内側カメラ
+    let firstCaptureTaken = false;
+
+    const firstCaptureElement = document.getElementById('firstCapture');
+    const secondCaptureElement = document.getElementById('secondCapture');
+    const overlayMessage = document.getElementById('overlayMessage');
+    const captureButton = document.getElementById('captureButton');
+
+    // カメラ映像のキャプチャ
+    async function captureImage() {
+        const video = document.createElement('video');
+        const stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: currentCamera }
+        });
+        video.srcObject = stream;
+        await video.play();
+
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const context = canvas.getContext('2d');
+        context.translate(canvas.width, 0); // 左右反転
+        context.scale(-1, 1);
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        stream.getTracks().forEach(track => track.stop()); // ストリームを停止
+
+        return canvas.toDataURL('image/png');
+    }
+
+    // 3秒後に再撮影
+    function showMessageAndRetake() {
+        overlayMessage.style.display = 'block';
+
+        setTimeout(async () => {
+            overlayMessage.style.display = 'none';
+            currentCamera = currentCamera === 'user' ? 'environment' : 'user'; // カメラ切り替え
+            const secondImage = await captureImage();
+            secondCaptureElement.src = secondImage;
+        }, 3000);
+    }
+
+    // ボタンを押したときの動作
+    captureButton.addEventListener('click', async () => {
+        if (!firstCaptureTaken) {
+            // 1回目の撮影
+            const firstImage = await captureImage();
+            firstCaptureElement.src = firstImage;
+            firstCaptureTaken = true;
+
+            // メッセージ表示後、3秒後に再撮影
+            showMessageAndRetake();
+        }
+    });
+</script>
+
+</body>
+</html>
