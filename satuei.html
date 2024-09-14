@@ -21,11 +21,13 @@
         .header {
             width: 100%;
             display: flex;
-            justify-content: space-between;
+            justify-content: center; /* 中央に配置 */
             align-items: center;
             padding: 10px;
             background-color: #000;
             z-index: 10;
+            position: fixed; /* スクロールしても固定 */
+            top: 0;
         }
 
         .header .title {
@@ -35,8 +37,10 @@
         }
 
         .header .back-button {
+            position: absolute;
+            left: 10px;
             color: #fff;
-            font-size: 18px;
+            font-size: 24px; /* ×のサイズ */
             cursor: pointer;
         }
 
@@ -47,6 +51,7 @@
             justify-content: center;
             align-items: center;
             position: relative;
+            padding-top: 60px; /* ヘッダーの高さ分の余白 */
         }
 
         #cameraContainer {
@@ -70,6 +75,7 @@
             top: 10px;
             left: 10px;
             border: 2px solid black;
+            display: none; /* 初期状態で非表示 */
         }
 
         #overlayMessage {
@@ -92,6 +98,8 @@
             display: flex;
             justify-content: center;
             background-color: #000;
+            position: fixed; /* スクロールしても固定 */
+            bottom: 0;
         }
 
         .footer img {
@@ -102,10 +110,16 @@
         }
 
         .button-container {
+            display: none; /* 初期状態で非表示 */
             margin-top: 20px;
             display: flex;
             justify-content: center;
             gap: 20px;
+            position: fixed;
+            bottom: 80px; /* フッターの上に配置 */
+            width: 100%;
+            background-color: #000;
+            padding: 10px 0;
         }
 
         .button-container button {
@@ -121,12 +135,13 @@
 <body>
 
 <div class="header">
-    <div class="back-button" onclick="goBack()">← 戻る</div>
-    <div class="title">MakoReal.</div>
+    <div class="back-button" onclick="goBack()">×</div>
+    <div class="title">MakoReal</div>
 </div>
 
 <div class="content">
     <div id="cameraContainer">
+        <video id="cameraVideo" autoplay></video> <!-- カメラの映像を表示 -->
         <img id="firstCapture" alt="First Capture">
         <img id="secondCapture" alt="Second Capture">
         <div id="overlayMessage">はい、まこと！</div>
@@ -154,36 +169,35 @@
     const retryButton = document.getElementById('retryButton');
     const postButton = document.getElementById('postButton');
     const swapButton = document.getElementById('swapButton');
+    const cameraVideo = document.getElementById('cameraVideo');
+    const buttonContainer = document.querySelector('.button-container');
 
     // 戻るボタンの処理
     function goBack() {
         window.location.href = 'MakoReal.html';
     }
 
+    // カメラ映像の初期設定
+    async function initCamera() {
+        const stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: 'user' } // 内側カメラをデフォルトに設定
+        });
+        cameraVideo.srcObject = stream;
+    }
+
     // カメラ映像のキャプチャ
     async function captureImage() {
-        const video = document.createElement('video');
-        const stream = await navigator.mediaDevices.getUserMedia({
-            video: { facingMode: currentCamera }
-        });
-        video.srcObject = stream;
-        await video.play();
-
         const canvas = document.createElement('canvas');
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
+        canvas.width = cameraVideo.videoWidth;
+        canvas.height = cameraVideo.videoHeight;
         const context = canvas.getContext('2d');
-        context.translate(canvas.width, 0); // 左右反転
-        context.scale(-1, 1);
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-        stream.getTracks().forEach(track => track.stop()); // ストリームを停止
+        context.drawImage(cameraVideo, 0, 0, canvas.width, canvas.height);
 
         return canvas.toDataURL('image/png');
     }
 
     // 1秒後に再撮影
-    function showMessageAndRetake() {
+    async function showMessageAndRetake() {
         overlayMessage.style.display = 'block';
 
         setTimeout(async () => {
@@ -191,6 +205,8 @@
             currentCamera = currentCamera === 'user' ? 'environment' : 'user'; // カメラ切り替え
             const secondImage = await captureImage();
             secondCaptureElement.src = secondImage;
+            secondCaptureElement.style.display = 'block'; // 2回目の撮影画像を表示
+            buttonContainer.style.display = 'flex'; // ボタンを表示
         }, 1000); // 1秒後に再撮影
     }
 
@@ -203,7 +219,7 @@
             firstCaptureTaken = true;
 
             // メッセージ表示後、1秒後に再撮影
-            showMessageAndRetake();
+            await showMessageAndRetake();
         }
     });
 
@@ -223,6 +239,9 @@
         firstCaptureElement.src = secondCaptureElement.src;
         secondCaptureElement.src = tempSrc;
     });
+
+    // ページ読み込み時にカメラ初期化
+    window.addEventListener('load', initCamera);
 </script>
 
 </body>
