@@ -3,148 +3,200 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>撮影ページ</title>
+    <title>MakoReal</title>
     <style>
         body {
             margin: 0;
             font-family: Arial, sans-serif;
             background-color: #000;
             color: #fff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
         }
 
-        .container {
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background-color: #000;
+        }
+
+        header h1 {
+            color: #fff;
+            font-size: 24px;
+        }
+
+        .icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .post-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            background-color: #000;
+        }
+
+        .post-header {
+            display: flex;
+            width: 90%;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .post-header .username {
+            display: flex;
+            align-items: center;
+        }
+
+        .username .icon {
+            margin-right: 10px;
+        }
+
+        .post-header h2 {
+            font-size: 18px;
+            margin: 0;
+        }
+
+        .time-late {
+            font-size: 14px;
+            color: #999;
+        }
+
+        .post-body {
+            width: 90%;
+            background-color: #00ff00;
             position: relative;
-            width: 90vw;
-            height: 90vh;
+            height: 500px;
+        }
+
+        .post-body img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%; /* 画像を丸くする */
         }
 
         .camera-preview {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border: 2px solid #000;
-            border-radius: 10px;
-        }
-
-        .small-preview {
-            position: absolute;
             top: 10px;
             left: 10px;
-            width: 20%;
-            height: 20%;
-            object-fit: cover;
+            width: 100px;
+            height: 100px;
             border: 2px solid #000;
-            border-radius: 10px;
-            display: none; /* 初めは非表示 */
+            border-radius: 50%; /* プレビュー画像を丸くする */
         }
 
-        .controls {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
+        footer {
             display: flex;
-            justify-content: space-between;
-            width: 200px;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background-color: #000;
         }
 
-        .capture-button, .toggle-camera {
+        .capture-button {
             background-color: transparent;
             border: none;
             cursor: pointer;
         }
 
-        .capture-button img, .toggle-camera img {
+        .capture-button img {
             width: 70px;
             height: 70px;
             border-radius: 50%;
         }
 
-        .small-preview {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            width: 20%;
-            height: 20%;
-            border: 2px solid #000;
-            border-radius: 10px;
+        .no-posts-message {
+            text-align: center;
+            color: #fff;
+            margin-top: 20px;
+            font-size: 16px;
         }
-
     </style>
+    <!-- Firebase App (必須) -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+    <!-- Firebase Authentication (必須) -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"></script>
 </head>
 <body>
 
-<div class="container">
-    <video id="video" class="camera-preview" autoplay></video>
-    <canvas id="canvas" style="display: none;"></canvas>
-    <img id="first-image" class="camera-preview" style="display: none;">
-    <img id="small-preview" class="small-preview">
-    <div class="controls">
-        <button class="capture-button" id="capture-button">
-            <img src="path/to/capture-icon.png" alt="Capture">
-        </button>
-        <button class="toggle-camera" id="toggle-camera">
-            <img src="path/to/camera-toggle-icon.png" alt="Toggle Camera">
-        </button>
+<header>
+    <div></div> <!-- 左上の緑ボタンを削除 -->
+    <h1>MakoReal.</h1>
+    <div class="icon" id="profile-icon">
+        <img id="profile-img" src="" alt="Profile Icon" style="width: 40px; height: 40px; border-radius: 50%;"> <!-- 右上のアイコンに変更 -->
     </div>
+</header>
+
+<div class="post-container" id="post-container">
+    <!-- 投稿がない場合のメッセージ -->
+    <div class="no-posts-message" id="no-posts-message">投稿がありません。友達にMakoRealを共有しよう！</div>
 </div>
 
-<script>
-    const video = document.getElementById('video');
-    const canvas = document.getElementById('canvas');
-    const ctx = canvas.getContext('2d');
-    const firstImageElement = document.getElementById('first-image');
-    const smallPreview = document.getElementById('small-preview');
-    const captureButton = document.getElementById('capture-button');
-    const toggleCameraButton = document.getElementById('toggle-camera');
-    let currentStream;
-    let frontCamera = true;
-    let firstImage = null;
+<footer>
+    <button class="capture-button" id="transition-button">
+        <img src="path/to/button-image.jpg" alt="Capture Button"> <!-- 画ボタンを画像に変更 -->
+    </button>
+</footer>
 
-    async function startCamera() {
-        const constraints = { video: { facingMode: frontCamera ? 'user' : 'environment' } };
-        if (currentStream) {
-            currentStream.getTracks().forEach(track => track.stop());
-        }
-        currentStream = await navigator.mediaDevices.getUserMedia(constraints);
-        video.srcObject = currentStream;
-    }
+<script type="module">
+    // Firebase設定
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
 
-    function captureImage() {
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        const dataUrl = canvas.toDataURL();
+    const firebaseConfig = {
+        apiKey: "AIzaSyBNwcRVa1Ip_3ZX3qjxkbwd-ViScS3lbEg",
+        authDomain: "makoreal.firebaseapp.com",
+        projectId: "makoreal",
+        storageBucket: "makoreal.appspot.com",
+        messagingSenderId: "1063358529065",
+        appId: "1:1063358529065:web:e7f2da6177516a71926638",
+        measurementId: "G-K35J2B3QJT"
+    };
 
-        if (!firstImage) {
-            firstImage = dataUrl;
-            firstImageElement.src = firstImage;
-            firstImageElement.style.display = 'block';
-            smallPreview.style.display = 'block';
-            smallPreview.src = '';
+    // Firebase初期化
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // ユーザーの状態を監視し、プロフィール画像を表示
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            const profileImg = document.getElementById('profile-img');
+            // photoURLがある場合、それを表示
+            if (user.photoURL) {
+                profileImg.src = user.photoURL;
+            } else {
+                profileImg.src = 'path/to/default-image.jpg'; // デフォルト画像
+            }
         } else {
-            smallPreview.src = dataUrl;
-            smallPreview.style.display = 'block';
-            firstImageElement.src = firstImage;
-            firstImageElement.style.display = 'block';
+            // ユーザーがサインインしていない場合の処理
+            window.location.href = 'roguin.html'; // ログインページへリダイレクト
         }
-    }
-
-    captureButton.addEventListener('click', captureImage);
-    toggleCameraButton.addEventListener('click', () => {
-        frontCamera = !frontCamera;
-        startCamera();
     });
 
-    startCamera();
+    // 「画」ボタンを押したときに satuei.html に移行する処理
+    document.getElementById('transition-button').addEventListener('click', function() {
+        window.location.href = 'satuei.html';
+    });
+
+    // 右上のアイコンをクリックすると maipeji.html に移行
+    document.getElementById('profile-icon').addEventListener('click', function() {
+        window.location.href = 'maipeji.html';
+    });
+
+    // ダミーデータによる投稿のチェック
+    const hasPosts = false; // 実際のデータに基づいて変更
+
+    if (hasPosts) {
+        document.getElementById('no-posts-message').style.display = 'none';
+        // 実際の投稿をここに追加するコードを挿入
+    } else {
+        document.getElementById('no-posts-message').style.display = 'block';
+    }
 </script>
 
 </body>
