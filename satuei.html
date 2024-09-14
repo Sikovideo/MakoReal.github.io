@@ -21,7 +21,7 @@
         .header {
             width: 100%;
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
             padding: 10px;
             background-color: #000;
@@ -29,15 +29,9 @@
         }
 
         .header .title {
-            font-size: 24px;
+            font-size: 28px;
+            font-weight: bold;
             color: #fff;
-        }
-
-        .header .icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background-color: green;
         }
 
         .content {
@@ -50,12 +44,15 @@
         }
 
         #cameraContainer {
-            width: 75%;
+            width: 100%;
+            max-width: 100%;
+            height: auto;
             position: relative;
         }
 
         #firstCapture {
             width: 100%;
+            height: auto;
             aspect-ratio: 3 / 4;
             object-fit: cover;
         }
@@ -74,12 +71,13 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background-color: rgba(0, 0, 0, 0.8); /* 真っ暗に */
+            background-color: #000; /* 完全に黒 */
             color: white;
-            font-size: 36px;
+            font-size: 32px;
             padding: 20px;
             display: none;
             z-index: 5;
+            white-space: nowrap;
         }
 
         .footer {
@@ -103,9 +101,7 @@
 <body>
 
 <div class="header">
-    <div class="icon"></div>
     <div class="title">MakoReal.</div>
-    <div class="icon"></div>
 </div>
 
 <div class="content">
@@ -151,7 +147,7 @@
         return canvas.toDataURL('image/png');
     }
 
-    // 3秒後に再撮影
+    // 1秒後に再撮影
     function showMessageAndRetake() {
         overlayMessage.style.display = 'block';
 
@@ -160,7 +156,7 @@
             currentCamera = currentCamera === 'user' ? 'environment' : 'user'; // カメラ切り替え
             const secondImage = await captureImage();
             secondCaptureElement.src = secondImage;
-        }, 3000);
+        }, 1000); // 1秒後に再撮影
     }
 
     // ボタンを押したときの動作
@@ -171,7 +167,7 @@
             firstCaptureElement.src = firstImage;
             firstCaptureTaken = true;
 
-            // メッセージ表示後、3秒後に再撮影
+            // メッセージ表示後、1秒後に再撮影
             showMessageAndRetake();
         }
     });
